@@ -1,0 +1,75 @@
+PROJECT: mini-library
+AUTHOR: Ogrenci Adi (Ogrenci No)
+VERSION: v1
+DATE: 2026-03-16
+
+========================================
+OVERVIEW
+========================================
+
+mini-library is a command-line book management system.
+It stores books in a plain text file and supports
+adding, listing, borrowing, returning, and deleting books.
+
+All data is persisted in a directory called .minilibrary/
+in the current working directory.
+
+========================================
+COMMANDS
+========================================
+
+--- init ---
+Usage: python minilibrary.py init
+Creates a .minilibrary/ directory and an empty books.dat file.
+If .minilibrary/ already exists, print "Already initialized" and exit.
+
+--- add ---
+Usage: python minilibrary.py add "The Little Prince" "Antoine de Saint-Exupery"
+Appends a new book to books.dat with status AVAILABLE.
+Each book has: id (auto-increment), title, author, status, added_date.
+Prints "Added book #<id>: <title> by <author>"
+
+--- list ---
+Usage: python minilibrary.py list
+Prints all books, one per line:
+  [1] [AVAILABLE] The Little Prince - Antoine de Saint-Exupery (2026-03-16)
+  [2] [BORROWED] 1984 - George Orwell (2026-03-15)
+If no books exist, prints "No books found."
+
+--- borrow ---
+Usage: python minilibrary.py borrow 1
+Changes book #1 status from AVAILABLE to BORROWED.
+Prints "Book #1 borrowed."
+If book does not exist, prints "Book #1 not found."
+If book is already borrowed, prints "Book #1 is already borrowed."
+
+--- return ---
+Usage: python minilibrary.py return 1
+Changes book #1 status from BORROWED to AVAILABLE.
+Prints "Book #1 returned."
+If book does not exist, prints "Book #1 not found."
+If book is already available, prints "Book #1 is not borrowed."
+
+--- delete ---
+Usage: python minilibrary.py delete 1
+Removes book #1 from books.dat.
+Prints "Deleted book #1."
+If book does not exist, prints "Book #1 not found."
+
+========================================
+DATA FORMAT
+========================================
+
+File: .minilibrary/books.dat
+Format: One book per line, fields separated by |
+Example:
+1|The Little Prince|Antoine de Saint-Exupery|AVAILABLE|2026-03-16
+2|1984|George Orwell|BORROWED|2026-03-15
+
+========================================
+ERROR HANDLING
+========================================
+
+- Running any command before "init": print "Not initialized. Run: python minilibrary.py init"
+- Invalid command: print "Unknown command: <command>"
+- Missing arguments: print "Usage: python minilibrary.py <command> [args]"
