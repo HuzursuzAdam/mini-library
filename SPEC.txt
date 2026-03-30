@@ -1,7 +1,7 @@
 PROJECT: mini-library
-AUTHOR: Muhammmed Mustafa Aydemir 251478095
+AUTHOR: Muhammed Mustafa Aydemir
 VERSION: v1
-DATE: 2026-03-30
+DATE: 2026-03-16
 
 ========================================
 OVERVIEW
@@ -10,7 +10,8 @@ OVERVIEW
 mini-library is a command-line book management system.
 It stores books in a plain text file and supports
 adding, listing, borrowing, returning, deleting books,
-requesting new books, and tracking borrow durations.
+requesting new books, tracking borrow durations,
+and categorizing books by genre.
 
 All data is persisted in a directory called .minilibrary/
 in the current working directory.
@@ -24,6 +25,10 @@ Users can request books that are not in the library.
 When 3 different users request the same book, the system
 automatically places an order for that book.
 
+Each book has a genre field (e.g. Science-Fiction, Fantasy,
+History, Philosophy, Romance, Horror, Biography, Self-Help).
+Users can filter the book list by genre.
+
 ========================================
 COMMANDS
 ========================================
@@ -36,19 +41,26 @@ Creates a .minilibrary/ directory with the following empty files:
 If .minilibrary/ already exists, print "Already initialized" and exit.
 
 --- add ---
-Usage: python minilibrary.py add "The Little Prince" "Antoine de Saint-Exupery"
+Usage: python minilibrary.py add "The Little Prince" "Antoine de Saint-Exupery" "Fantasy"
 Appends a new book to books.dat with status AVAILABLE.
-Each book has: id (auto-increment), title, author, status, added_date, borrow_date.
+Each book has: id (auto-increment), title, author, genre, status, added_date, borrow_date.
 borrow_date is empty ("") when status is AVAILABLE.
-Prints "Added book #<id>: <title> by <author>"
+Prints "Added book #<id>: <title> by <author> [<genre>]"
 
 --- list ---
 Usage: python minilibrary.py list
 Prints all books, one per line:
-  [1] [AVAILABLE] The Little Prince - Antoine de Saint-Exupery (2026-03-16)
-  [2] [BORROWED] 1984 - George Orwell (2026-03-15) [Due: 2026-03-29]
+  [1] [AVAILABLE] The Little Prince - Antoine de Saint-Exupery [Fantasy] (2026-03-16)
+  [2] [BORROWED] 1984 - George Orwell [Science-Fiction] (2026-03-15) [Due: 2026-03-29]
 If no books exist, prints "No books found."
 For borrowed books, the due date (borrow_date + 14 days) is shown.
+
+--- filter ---
+Usage: python minilibrary.py filter "Science-Fiction"
+Prints only books matching the given genre, one per line:
+  [2] [AVAILABLE] 1984 - George Orwell [Science-Fiction] (2026-03-15)
+If no books match, prints "No books found in genre: <genre>"
+Genre matching is case-insensitive.
 
 --- borrow ---
 Usage: python minilibrary.py borrow 1
@@ -80,14 +92,14 @@ Prints "Deleted book #1."
 If book does not exist, prints "Book #1 not found."
 
 --- request ---
-Usage: python minilibrary.py request "Clean Code" "Robert C. Martin"
+Usage: python minilibrary.py request "Clean Code" "Robert C. Martin" "Self-Help"
 Adds a request entry to requests.dat.
-Each request has: title, author, request_count.
+Each request has: title, author, genre, request_count.
 
 If the book is already in requests.dat, increment request_count by 1.
 If the book is not in requests.dat, add it with request_count = 1.
 
-Prints "Request recorded for: <title> by <author> (<request_count>/3)"
+Prints "Request recorded for: <title> by <author> [<genre>] (<request_count>/3)"
 
 When request_count reaches 3, print "Order placed for: <title> by <author>"
 and remove the entry from requests.dat.
@@ -98,8 +110,8 @@ print "Book already exists in library: <title>" and do not record the request.
 --- listrequests ---
 Usage: python minilibrary.py listrequests
 Prints all pending requests, one per line:
-  [1/3] Clean Code - Robert C. Martin
-  [2/3] Design Patterns - Gang of Four
+  [1/3] Clean Code - Robert C. Martin [Self-Help]
+  [2/3] Design Patterns - Gang of Four [Science-Fiction]
 If no requests exist, prints "No pending requests."
 
 ========================================
@@ -108,19 +120,19 @@ DATA FORMAT
 
 File: .minilibrary/books.dat
 Format: One book per line, fields separated by |
-Fields: id|title|author|status|added_date|borrow_date
+Fields: id|title|author|genre|status|added_date|borrow_date
 Example:
-1|The Little Prince|Antoine de Saint-Exupery|AVAILABLE|2026-03-16|
-2|1984|George Orwell|BORROWED|2026-03-15|2026-03-20
+1|The Little Prince|Antoine de Saint-Exupery|Fantasy|AVAILABLE|2026-03-16|
+2|1984|George Orwell|Science-Fiction|BORROWED|2026-03-15|2026-03-20
 
 Note: borrow_date is empty when status is AVAILABLE.
 
 File: .minilibrary/requests.dat
 Format: One request per line, fields separated by |
-Fields: title|author|request_count
+Fields: title|author|genre|request_count
 Example:
-Clean Code|Robert C. Martin|2
-Design Patterns|Gang of Four|1
+Clean Code|Robert C. Martin|Self-Help|2
+Design Patterns|Gang of Four|Science-Fiction|1
 
 ========================================
 ERROR HANDLING
@@ -130,6 +142,7 @@ ERROR HANDLING
 - Invalid command: print "Unknown command: <command>"
 - Missing arguments: print "Usage: python minilibrary.py <command> [args]"
 - Requesting a book that already exists in library: print "Book already exists in library: <title>"
+- Filtering with no matches: print "No books found in genre: <genre>"
 
 ========================================
 BORROW DURATION RULES
@@ -153,3 +166,21 @@ REQUEST SYSTEM RULES
 - After ordering, the entry is removed from requests.dat.
 - Adding the ordered book to books.dat is done manually via the "add" command.
 - Duplicate requests from the same session are allowed (no user tracking in v1).
+
+========================================
+GENRE CATEGORIES
+========================================
+
+Supported genres (not enforced, free text input):
+- Science-Fiction
+- Fantasy
+- History
+- Philosophy
+- Romance
+- Horror
+- Biography
+- Self-Help
+- Technical
+- Literature
+
+Genre is stored as-is. Filtering is case-insensitive.
