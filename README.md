@@ -1,22 +1,22 @@
 # mini-library
 
-CLI-based book management system.
+A command-line book management system.
 
-## V0 → V1 Degisiklikler
+## V0 → V1 Changes
 
 ### V0
-- Sadece init ve add komutlari calisiyordu
-- Dongu kullanilmadi
+- Only init and add commands were functional
+- No loops used
 
 ### V1
-- Tum komutlar implemente edildi (list, borrow, return, delete)
-- Kitap talep sistemi eklendi (request, listrequests)
-- Odunc sure takibi eklendi (14 gun, countdown)
-- While dongusu kullanildi, for ve liste kullanilmadi
+- All commands implemented (list, borrow, return, delete)
+- Book request system added (request, listrequests)
+- Borrow duration tracking added (14-day loan period with countdown)
+- While loops used, no for loops or lists
 
-### V1 Gorev Listesi
-1. list komutu implemente edildi
-2. borrow ve return komutlari implemente edildi (sure takibi ile)
-3. delete komutu implemente edildi
-4. request ve listrequests komutlari implemente edildi
-5. Hata mesajlari iyilestirildi
+### V1 Task List
+1. Implemented list command (read file line by line with while loop)
+2. Implemented borrow and return commands (with 14-day duration tracking)
+3. Implemented delete command
+4. Implemented request and listrequests commands
+5. Improved error handling
