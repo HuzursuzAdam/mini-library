@@ -1,6 +1,6 @@
 """
 mini-library SPEC test senaryolari
-Ogrenci: Ogrenci Adi (Ogrenci No)
+Ogrenci: Muhammed Mustafa Aydemir 251478095
 Proje: mini-library
 """
 import subprocess
