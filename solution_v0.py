@@ -1,6 +1,6 @@
 """
 mini-library v0 — Basitlestirilmis implementasyon
-Ogrenci: Ogrenci Adi (Ogrenci No)
+Ogrenci: Muhammed Mustafa Aydemir 251478095
 
 Kapsam: Sadece init ve add komutlari.
 Sinirlamalar: Dongu ve liste henuz kullanilmadi.
