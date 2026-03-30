@@ -1,6 +1,6 @@
 """
 mini-library SPEC test senaryolari - V1
-Ogrenci: Ogrenci Adi (Ogrenci No)
+Ogrenci: Muhammed Mustafa Aydemir 251478095
 Proje: mini-library
 
 V1 Gorev Listesi:
@@ -8,7 +8,8 @@ V1 Gorev Listesi:
   2. borrow ve return komutlari implemente edildi (sure takibi ile)
   3. delete komutu implemente edildi
   4. request ve listrequests komutlari implemente edildi
-  5. Hata mesajlari iyilestirildi
+  5. filter komutu implemente edildi (ture gore filtreleme)
+  6. Hata mesajlari iyilestirildi
 """
 import subprocess
 import os
@@ -55,15 +56,16 @@ def test_init_already_exists():
 
 def test_add_single_book():
     run_cmd(["init"])
-    output = run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery"])
+    output = run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery", "Fantasy"])
     assert "Added book #1" in output
     assert "The Little Prince" in output
+    assert "Fantasy" in output
 
 
 def test_add_multiple_books():
     run_cmd(["init"])
-    run_cmd(["add", "Book One", "Author One"])
-    output = run_cmd(["add", "Book Two", "Author Two"])
+    run_cmd(["add", "Book One", "Author One", "History"])
+    output = run_cmd(["add", "Book Two", "Author Two", "Horror"])
     assert "#2" in output
 
 
@@ -79,19 +81,49 @@ def test_list_empty():
 
 def test_list_shows_books():
     run_cmd(["init"])
-    run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery"])
+    run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery", "Fantasy"])
     output = run_cmd(["list"])
     assert "The Little Prince" in output
     assert "AVAILABLE" in output
+    assert "Fantasy" in output
 
 
 def test_list_shows_multiple_books():
     run_cmd(["init"])
-    run_cmd(["add", "Book One", "Author One"])
-    run_cmd(["add", "Book Two", "Author Two"])
+    run_cmd(["add", "Book One", "Author One", "History"])
+    run_cmd(["add", "Book Two", "Author Two", "Horror"])
     output = run_cmd(["list"])
     assert "Book One" in output
     assert "Book Two" in output
+
+
+# ========================================
+# filter testleri
+# ========================================
+
+def test_filter_finds_books():
+    run_cmd(["init"])
+    run_cmd(["add", "Dune", "Frank Herbert", "Science-Fiction"])
+    run_cmd(["add", "1984", "George Orwell", "Science-Fiction"])
+    run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery", "Fantasy"])
+    output = run_cmd(["filter", "Science-Fiction"])
+    assert "Dune" in output
+    assert "1984" in output
+    assert "The Little Prince" not in output
+
+
+def test_filter_no_match():
+    run_cmd(["init"])
+    run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery", "Fantasy"])
+    output = run_cmd(["filter", "Horror"])
+    assert "No books found in genre" in output
+
+
+def test_filter_case_insensitive():
+    run_cmd(["init"])
+    run_cmd(["add", "Dune", "Frank Herbert", "Science-Fiction"])
+    output = run_cmd(["filter", "science-fiction"])
+    assert "Dune" in output
 
 
 # ========================================
@@ -100,7 +132,7 @@ def test_list_shows_multiple_books():
 
 def test_borrow_marks_book():
     run_cmd(["init"])
-    run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery"])
+    run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery", "Fantasy"])
     output = run_cmd(["borrow", "1"])
     assert "borrowed" in output
     assert "Due date" in output
@@ -114,7 +146,7 @@ def test_borrow_nonexistent():
 
 def test_borrow_already_borrowed():
     run_cmd(["init"])
-    run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery"])
+    run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery", "Fantasy"])
     run_cmd(["borrow", "1"])
     output = run_cmd(["borrow", "1"])
     assert "already borrowed" in output
@@ -122,7 +154,7 @@ def test_borrow_already_borrowed():
 
 def test_borrow_shows_countdown():
     run_cmd(["init"])
-    run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery"])
+    run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery", "Fantasy"])
     run_cmd(["borrow", "1"])
     output = run_cmd(["borrow", "1"])
     assert "available in" in output or "overdue" in output
@@ -134,7 +166,7 @@ def test_borrow_shows_countdown():
 
 def test_return_marks_book():
     run_cmd(["init"])
-    run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery"])
+    run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery", "Fantasy"])
     run_cmd(["borrow", "1"])
     output = run_cmd(["return", "1"])
     assert "returned" in output
@@ -148,7 +180,7 @@ def test_return_nonexistent():
 
 def test_return_not_borrowed():
     run_cmd(["init"])
-    run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery"])
+    run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery", "Fantasy"])
     output = run_cmd(["return", "1"])
     assert "not borrowed" in output
 
@@ -159,7 +191,7 @@ def test_return_not_borrowed():
 
 def test_delete_removes_book():
     run_cmd(["init"])
-    run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery"])
+    run_cmd(["add", "The Little Prince", "Antoine de Saint-Exupery", "Fantasy"])
     output = run_cmd(["delete", "1"])
     assert "Deleted" in output
     list_output = run_cmd(["list"])
@@ -178,30 +210,30 @@ def test_delete_nonexistent():
 
 def test_request_new_book():
     run_cmd(["init"])
-    output = run_cmd(["request", "Clean Code", "Robert C. Martin"])
+    output = run_cmd(["request", "Clean Code", "Robert C. Martin", "Self-Help"])
     assert "Request recorded" in output
     assert "1/3" in output
 
 
 def test_request_increment():
     run_cmd(["init"])
-    run_cmd(["request", "Clean Code", "Robert C. Martin"])
-    output = run_cmd(["request", "Clean Code", "Robert C. Martin"])
+    run_cmd(["request", "Clean Code", "Robert C. Martin", "Self-Help"])
+    output = run_cmd(["request", "Clean Code", "Robert C. Martin", "Self-Help"])
     assert "2/3" in output
 
 
 def test_request_triggers_order():
     run_cmd(["init"])
-    run_cmd(["request", "Clean Code", "Robert C. Martin"])
-    run_cmd(["request", "Clean Code", "Robert C. Martin"])
-    output = run_cmd(["request", "Clean Code", "Robert C. Martin"])
+    run_cmd(["request", "Clean Code", "Robert C. Martin", "Self-Help"])
+    run_cmd(["request", "Clean Code", "Robert C. Martin", "Self-Help"])
+    output = run_cmd(["request", "Clean Code", "Robert C. Martin", "Self-Help"])
     assert "Order placed" in output
 
 
 def test_request_existing_book():
     run_cmd(["init"])
-    run_cmd(["add", "Clean Code", "Robert C. Martin"])
-    output = run_cmd(["request", "Clean Code", "Robert C. Martin"])
+    run_cmd(["add", "Clean Code", "Robert C. Martin", "Self-Help"])
+    output = run_cmd(["request", "Clean Code", "Robert C. Martin", "Self-Help"])
     assert "already exists" in output
 
 
@@ -217,10 +249,11 @@ def test_listrequests_empty():
 
 def test_listrequests_shows_requests():
     run_cmd(["init"])
-    run_cmd(["request", "Clean Code", "Robert C. Martin"])
+    run_cmd(["request", "Clean Code", "Robert C. Martin", "Self-Help"])
     output = run_cmd(["listrequests"])
     assert "Clean Code" in output
     assert "1/3" in output
+    assert "Self-Help" in output
 
 
 # ========================================
@@ -228,7 +261,7 @@ def test_listrequests_shows_requests():
 # ========================================
 
 def test_command_before_init():
-    output = run_cmd(["add", "Some Book", "Some Author"])
+    output = run_cmd(["add", "Some Book", "Some Author", "Fantasy"])
     assert "Not initialized" in output
 
 
